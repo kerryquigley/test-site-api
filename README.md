@@ -10,7 +10,8 @@ API Calls via Chrome
 Get http://localhost:8080/api/sites/
 
 Post http://localhost:8080/api/sites/
-body:     {
+body: ```json
+      {
       "city": "Townsend",
       "name": "CVS (Townsend)",
       "hasAvailability": false,
@@ -20,9 +21,10 @@ body:     {
       "latitude": 41.7878682,
       "longitude": -69.9923008
     }
+    ```
     
 Put http://localhost:8080/api/sites/CVS%20Townsend)
-body:     {
+body:  ```json   {
       "city": "Townsend",
       "name": "CVS (Townsend)",
       "hasAvailability": false,
@@ -31,7 +33,7 @@ body:     {
       "signUpLink": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine",
       "latitude": 41.7878682,
       "longitude": -69.9923008
-    }
+    } ```
     
 Delete http://localhost:8080/api/sites/6050ff98f38c862343eea561
 
