@@ -29,9 +29,9 @@ body:
 ```   {
       "city": "Townsend",
       "name": "CVS (Townsend)",
-      "hasAvailability": false,
+      "hasAvailability": true,
       "availability": {
-      	"slots": 0},
+      	"slots": 20},
       "signUpLink": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine",
       "latitude": 41.7878682,
       "longitude": -69.9923008
