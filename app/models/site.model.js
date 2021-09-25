@@ -4,7 +4,6 @@ module.exports = mongoose => {
       "site",
       mongoose.Schema (
         {
-            //siteName: String,
             name: String,
             street: String,
             city: String,

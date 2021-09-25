@@ -2,9 +2,37 @@
 const db = require("../models");
 const Site = db.sites;
 
+/*
+
+/**
+ * Created by kquigley on 9/6/16.
+ */
+
+"use strict";
+
+// const Model = require('models/active-cases.js');
+//const CaseEvents = require('data-access/case-events.js');
+//const R = require('ramda');
+//const defaultCallback = R.identity;
+//const { isNil } = require("ramda");
+
+
+
+/**
+ * getByCaseId
+ * Find single active case record by case id
+ * @param caseId
+ * @returns {*}
+ */
+//  module.exports.getByCaseId = function* (caseId) {
+//      return yield Model.findOne({caseId: caseId, closed: null});
+//  };
+
+
+
 // Create and Save a new Site
-exports.create = (req, res) => {
-    // Validate request
+module.exports.create = (req, res) => {
+  // Validate request
   if (!req.body.name) {
     res.status(400).send({ message: "Content can not be empty!" });
     return;
@@ -38,129 +66,147 @@ exports.create = (req, res) => {
           err.message || "Some error occurred while creating the Site."
       });
     });
-  
+
 };
 
 // Retrieve all Sites from the database.
-exports.findAll = (req, res) => {
-    const siteName = req.query.siteName;
-    var condition = siteName ? { name: { $regex: new RegExp(siteName), $options: "i" } } : {};
-  
-    Site.find(condition)
-      .then(data => {
-        res.send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Some error occurred while retrieving sites."
-        });
+module.exports.findAll = (req, res) => {
+  const siteName = req.query.siteName;
+  var condition = siteName ? { name: { $regex: new RegExp(siteName), $options: "i" } } : {};
+
+  Site.find(condition)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving sites."
       });
-  
+    });
+
 };
+
 
 // Find a single Site with an id
-exports.findOne = (req, res) => {
-    const id = req.params.id;
+module.exports.findOne = async (id) => {
+  console.log('id xxxx', id);
 
-    Site.findById(id)
-      .then(data => {
-        if (!data)
-          res.status(404).send({ message: "Not found Site with id " + id });
-        else res.send(data);
-      })
-      .catch(err => {
-        res
-          .status(500)
-          .send({ message: "Error retrieving Site with id=" + id });
-      });
-  
+  try {
+    const site = await Site.findById(id);
+    return site;
+  }
+  catch (err) {
+    console.log(err);
+    console.log("Error retrieving Site with id=" + id);
+    return (err);
+
+  };
+
 };
+// Find a single Site with an id
+// module.exports.findOne = (req, res) => {
+//     const id = req.params.id;
+
+//     Site.findById(id)
+//       .then(data => {
+//         if (!data)
+//           res.status(404).send({ message: "Not found Site with id " + id });
+//         else res.send(data);
+//       })
+//       .catch(err => {
+//         res
+//           .status(500)
+//           .send({ message: "Error retrieving Site with id=" + id });
+//       });
+
+// };
 
 // Update a Site by the id in the request
-exports.update = (req, res) => {
-    if (!req.body) {
-        return res.status(400).send({
-          message: "Data to update can not be empty!"
+module.exports.update = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!"
+    });
+  }
+
+  const id = req.params.id;
+
+  Site.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Site with id=${id}. Maybe Site was not found!`
         });
-      }
-    
-      const id = req.params.id;
-    
-      Site.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
-        .then(data => {
-          if (!data) {
-            res.status(404).send({
-              message: `Cannot update Site with id=${id}. Maybe Site was not found!`
-            });
-          } else res.send({ message: "Site was updated successfully." });
-        })
-        .catch(err => {
-          res.status(500).send({
-            message: "Error updating Site with id=" + id
-          });
-        });
-  
+      } else res.send({ message: "Site was updated successfully." });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Site with id=" + id
+      });
+    });
+
 };
 
 // Update a Site by the name in the request
-exports.upsert = (req, res) => {
+module.exports.upsert = (req, res) => {
   if (!req.body) {
-      return res.status(400).send({
-        message: "Data to update can not be empty!"
-      });
-    }
-  
-  
-    const name = req.params.name;
-    console.log (' name ', name);
-    
-    const query = {name: name};
-    console.log (query);
-    //Site.findAndModify(name, req.body, { upsert: true, new: true })
-    //Site.findOneAndUpdate(query, {hasAvailability: req.body.hasAvailability, availability: req.body.availability}, { upsert: true, useFindAndModify: false })
-    Site.findOneAndUpdate(query, req.body, { new: true, upsert: true, useFindAndModify: false })
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot update Site with id=${name}. Maybe Site was not found!` // this error should not occur; should create if not found
-          });
-        } else res.send({ message: "Site was updated successfully." });
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Error updating Site with name=" + name
+    return res.status(400).send({
+      message: "Data to update can not be empty!"
+    });
+  }
+
+
+  const name = req.params.name;
+  console.log(' name ', name);
+
+  const query = { name: name };
+  //console.log (query);
+  //Site.findAndModify(name, req.body, { upsert: true, new: true })
+  //Site.findOneAndUpdate(query, {hasAvailability: req.body.hasAvailability, availability: req.body.availability}, { upsert: true, useFindAndModify: false })
+  Site.findOneAndUpdate(query, req.body, { new: true, upsert: true, useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Site with id=${name}. Maybe Site was not found!` // this error should not occur; should create if not found
         });
+      } else res.send({ message: "Site was updated successfully." });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Site with name=" + name
       });
+    });
 
 };
 
 // Delete a Site with the specified id in the request
-exports.delete = (req, res) => {
-    const id = req.params.id;
+module.exports.delete = async (req, res) => {
+  const id = req.params.id;
 
-    Site.findByIdAndRemove(id)
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot delete Site with id=${id}. Maybe Site was not found!`
-          });
-        } else {
-          res.send({
-            message: "Site was deleted successfully!"
-          });
-        }
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Could not delete Site with id=" + id
+  Site.findByIdAndRemove(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete Site with id=${id}. Maybe Site was not found!`
         });
+      } else {
+        res.send({
+          message: "Site was deleted successfully!"
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Site with id=" + id
       });
+    });
 };
 
+
 // Delete all Sites from the database.
-exports.deleteAll = (req, res) => {
-    Site.deleteMany({})
+module.exports.deleteAll = (req, res) => {
+  Site.deleteMany({})
     .then(data => {
       res.send({
         message: `${data.deletedCount} Sites were deleted successfully!`
@@ -172,12 +218,12 @@ exports.deleteAll = (req, res) => {
           err.message || "Some error occurred while removing all sites."
       });
     });
-  
+
 };
 
 // Find all published Sites
 exports.findAllPublished = (req, res) => {
-    Site.find({ published: true })
+  Site.find({ published: true })
     .then(data => {
       res.send(data);
     })
@@ -187,5 +233,5 @@ exports.findAllPublished = (req, res) => {
           err.message || "Some error occurred while retrieving sites."
       });
     });
-  
+
 };
