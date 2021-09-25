@@ -1,5 +1,5 @@
 # test-site-api
-CRUD microservice API utilizing node.js, mongoose, and express
+CRUD microservice API utilizing node.js, mongoose, and express; this was a prototype back-end for one of the volunteer vaccine sites to help people find vaccines in early days when vaccine availability was low. 
 
   npm install express mongoose body-parser cors express-async-handler --save
 
