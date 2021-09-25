@@ -1,8 +1,8 @@
 # test-site-api
 CRUD microservice API utilizing node.js, mongoose, and express
 
->>npm install express mongoose body-parser cors --save
->>npm install express-async-handler --save
+  npm install express mongoose body-parser cors --save
+  npm install express-async-handler --save
 
 Using MongoDb Compass for viewing db and Atlas via AWS to store test database
 
