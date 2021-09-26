@@ -1,34 +1,8 @@
-
+/**
+ * Created by kquigley 3/2021.
+ */
 const db = require("../models");
 const Site = db.sites;
-
-/*
-
-/**
- * Created by kquigley on 9/6/16.
- */
-
-"use strict";
-
-// const Model = require('models/active-cases.js');
-//const CaseEvents = require('data-access/case-events.js');
-//const R = require('ramda');
-//const defaultCallback = R.identity;
-//const { isNil } = require("ramda");
-
-
-
-/**
- * getByCaseId
- * Find single active case record by case id
- * @param caseId
- * @returns {*}
- */
-//  module.exports.getByCaseId = function* (caseId) {
-//      return yield Model.findOne({caseId: caseId, closed: null});
-//  };
-
-
 
 // Create and Save a new Site
 module.exports.create = (req, res) => {
@@ -40,7 +14,6 @@ module.exports.create = (req, res) => {
 
   // Create a Site
   const site = new Site({
-    //siteName: req.body.siteName,
     name: req.body.name,
     street: req.body.street,
     city: req.body.city,
@@ -70,57 +43,38 @@ module.exports.create = (req, res) => {
 };
 
 // Retrieve all Sites from the database.
-module.exports.findAll = (req, res) => {
-  const siteName = req.query.siteName;
+module.exports.findAll = async (siteName) => {
+
   var condition = siteName ? { name: { $regex: new RegExp(siteName), $options: "i" } } : {};
 
-  Site.find(condition)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving sites."
-      });
-    });
-
-};
-
-
-// Find a single Site with an id
-module.exports.findOne = async (id) => {
-  console.log('id xxxx', id);
-
+  console.log("condition ", siteName);
   try {
-    const site = await Site.findById(id);
+    const site = Site.find(condition);
     return site;
   }
   catch (err) {
     console.log(err);
-    console.log("Error retrieving Site with id=" + id);
+    console.log("Error retrieving Sites");
     return (err);
 
   };
 
 };
+
 // Find a single Site with an id
-// module.exports.findOne = (req, res) => {
-//     const id = req.params.id;
+module.exports.findOne = async (id) => {
+  //try {
+  const site = await Site.findById(id);
+  return site;
+  //}
+  //catch (err) {
+  // console.log("Error retrieving Site with id=" + id);
+  //return (err);
 
-//     Site.findById(id)
-//       .then(data => {
-//         if (!data)
-//           res.status(404).send({ message: "Not found Site with id " + id });
-//         else res.send(data);
-//       })
-//       .catch(err => {
-//         res
-//           .status(500)
-//           .send({ message: "Error retrieving Site with id=" + id });
-//       });
+};
 
-// };
+//};
+
 
 // Update a Site by the id in the request
 module.exports.update = (req, res) => {

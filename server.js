@@ -1,23 +1,23 @@
 // Dependencies
-//var express = require("express");
-//var mongojs = require("mongojs");
-//var bodyParser = require('body-parser');
-
 const express = require('express');
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
 const app = express();
+//const asyncMiddleware = require("./app/utils/asyncMiddleware");
 
 var corsOptions = {
   origin: "http://localhost:8081"
 };
 
+var myLogger = function (req, res, next) {
+  console.log('LOGGED', res.json);
+  next()
+}
+
+app.use(myLogger)
+
+
 app.use(cors(corsOptions));
-
-// app.use(express.urlencoded({ extended: true }));
-
-// app.use(express.json());
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = require("./app/models");
-console.log ('db ', db, 'mongoose ');
+console.log('db ', db, 'mongoose ');
 db.mongoose
   .connect(db.url, {
     useNewUrlParser: true,
@@ -40,6 +40,7 @@ db.mongoose
     process.exit();
   });
 
+//app.use(asyncMiddleware()); // for error handling
 
 // simple route
 app.get("/", (req, res) => {
