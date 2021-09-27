@@ -1,8 +1,32 @@
 /**
  * Created by kquigley 3/2021.
+ * Mongo database calls for create/delete/update/get vaccine sites
+ * Originally coded in promise style; converted some methods to async/await as demonstration
+ * Prefer async / await for concise coding.
  */
 const db = require("../models");
 const Site = db.sites;
+
+
+// Find a single Site with an id
+// NOTE: Rewritten for async/await; unanticipated errors passed out to routes via asynchHandler 
+module.exports.findOne = async (id) => {
+
+  const site = await Site.findById(id);
+  if (!site) return ({ message: "Site with id= " + id + " not found." });
+  else return (site);
+};
+
+// Delete a Site with the specified id in the request
+// NOTE: Converted to async / await; errors handled at router level via asyncHandler
+module.exports.delete = async (id) => {
+
+  const deleted = await Site.findByIdAndRemove(id);
+  if (deleted) return ({ message: "Site was deleted successfully " });
+  else return ({ message: "Could not delete Site with id=" + id });
+
+};
+
 
 // Create and Save a new Site
 module.exports.create = (req, res) => {
@@ -42,39 +66,6 @@ module.exports.create = (req, res) => {
 
 };
 
-// Retrieve all Sites from the database.
-module.exports.findAll = async (siteName) => {
-
-  var condition = siteName ? { name: { $regex: new RegExp(siteName), $options: "i" } } : {};
-
-  console.log("condition ", siteName);
-  try {
-    const site = Site.find(condition);
-    return site;
-  }
-  catch (err) {
-    console.log(err);
-    console.log("Error retrieving Sites");
-    return (err);
-
-  };
-
-};
-
-// Find a single Site with an id
-module.exports.findOne = async (id) => {
-  //try {
-  const site = await Site.findById(id);
-  return site;
-  //}
-  //catch (err) {
-  // console.log("Error retrieving Site with id=" + id);
-  //return (err);
-
-};
-
-//};
-
 
 // Update a Site by the id in the request
 module.exports.update = (req, res) => {
@@ -110,14 +101,11 @@ module.exports.upsert = (req, res) => {
     });
   }
 
-
   const name = req.params.name;
   console.log(' name ', name);
 
   const query = { name: name };
-  //console.log (query);
-  //Site.findAndModify(name, req.body, { upsert: true, new: true })
-  //Site.findOneAndUpdate(query, {hasAvailability: req.body.hasAvailability, availability: req.body.availability}, { upsert: true, useFindAndModify: false })
+
   Site.findOneAndUpdate(query, req.body, { new: true, upsert: true, useFindAndModify: false })
     .then(data => {
       if (!data) {
@@ -134,27 +122,22 @@ module.exports.upsert = (req, res) => {
 
 };
 
-// Delete a Site with the specified id in the request
-module.exports.delete = async (req, res) => {
-  const id = req.params.id;
+// Retrieve all Sites from the database.
+// NOTE: Rewritten for async/await; errors passed out to routes via asynchHandler 
+// ALso note: Mongoose does not deal with queries as async await... thus no await
+module.exports.findAll = async (siteName) => {
 
-  Site.findByIdAndRemove(id)
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot delete Site with id=${id}. Maybe Site was not found!`
-        });
-      } else {
-        res.send({
-          message: "Site was deleted successfully!"
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete Site with id=" + id
-      });
-    });
+  var condition = siteName ? { name: { $regex: new RegExp(siteName), $options: "i" } } : {};
+  try {
+    const site = Site.find(condition);
+    return site;
+  }
+  catch (err) {
+    console.log("Error retrieving Sites");
+    return (err);
+
+  };
+
 };
 
 

@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const app = express();
-//const asyncMiddleware = require("./app/utils/asyncMiddleware");
 
 var corsOptions = {
   origin: "http://localhost:8081"
@@ -39,8 +38,6 @@ db.mongoose
     console.log("Cannot connect to the database!", err);
     process.exit();
   });
-
-//app.use(asyncMiddleware()); // for error handling
 
 // simple route
 app.get("/", (req, res) => {
